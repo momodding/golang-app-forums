@@ -2,6 +2,8 @@ package service
 
 import (
 	"database/sql"
+	"fmt"
+	"forum-app/entity"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -66,4 +68,23 @@ func (s *Suite) Test_Find_All_then_Return_data() {
 
 	res := s.service.FindAll()
 	assert.Equal(s.T(), id, res[0].ID)
+}
+
+func (s *Suite) Test_Save_then_Return_data() {
+	var (
+		id       = uint64(1)
+		currTime = time.Now()
+		category = &entity.Category{Name: "test", Description: "test", CreatedAt: &currTime, UpdatedAt: &currTime}
+	)
+	fmt.Println(currTime)
+	s.mock.ExpectBegin()
+	s.mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "category" ("name","description","created_at","updated_at","deleted_at") 
+						VALUES ($1,$2,$3,$4,$5) RETURNING "id"`)).
+		WithArgs(category.Name, category.Description, category.CreatedAt, category.UpdatedAt, category.DeletedAt).
+		WillReturnRows(sqlmock.NewRows([]string{"id"}).
+			AddRow(id))
+	s.mock.ExpectCommit()
+
+	res := s.service.Save(*category)
+	assert.Equal(s.T(), id, res.ID)
 }

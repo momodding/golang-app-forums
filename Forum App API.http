@@ -1,0 +1,14 @@
+### GET index
+GET localhost:3000
+
+### GET categories
+GET localhost:3000/categories
+
+### POST categories
+POST localhost:3000/categories
+Content-Type: application/json
+
+{
+  "name": "testing 3",
+  "description": "nyoba testing lagi 3"
+}

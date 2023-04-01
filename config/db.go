@@ -4,23 +4,36 @@ import (
 	"forum-app/helper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
+	"log"
+	"os"
+	"time"
 )
 
 type DBSession struct {
 	DB *gorm.DB
 }
 
-func NewDbSession() *DBSession {
-	dsn := "host=localhost user=momodding password=mache123 dbname=gorm port=5432 sslmode=disable TimeZone=Asia/Jakerta"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	helper.PanicIfError(err)
-	defer func(db *gorm.DB) {
-		sql, err := db.DB()
-		helper.PanicIfError(err)
-		sql.Close()
-	}(db)
+func NewDbSession() *gorm.DB {
+	dsn := "host=localhost user=momodding password=mache123 dbname=forum-app port=5432 sslmode=disable TimeZone=Asia/Jakarta"
 
-	return &DBSession{
-		db,
-	}
+	newLogger := logger.New(
+		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+		logger.Config{
+			SlowThreshold:             time.Second, // Slow SQL threshold
+			LogLevel:                  logger.Info, // Log level
+			IgnoreRecordNotFoundError: true,        // Ignore ErrRecordNotFound error for logger
+			Colorful:                  true,        // Disable color
+		},
+	)
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger})
+	helper.PanicIfError(err)
+	//defer func(db *gorm.DB) {
+	//	sql, err := db.DB()
+	//	helper.PanicIfError(err)
+	//	sql.Close()
+	//}(db)
+
+	return db
 }

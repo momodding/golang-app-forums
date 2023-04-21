@@ -15,7 +15,7 @@ type DBSession struct {
 }
 
 func NewDbSession() *gorm.DB {
-	dsn := "host=localhost user=momodding password=mache123 dbname=forum-app port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	dsn := "host=winhost user=momodding password=mache123 dbname=forum-app port=5432 sslmode=disable TimeZone=Asia/Jakarta"
 
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
@@ -27,7 +27,7 @@ func NewDbSession() *gorm.DB {
 		},
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger})
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{Logger: newLogger, DisableForeignKeyConstraintWhenMigrating: true})
 	helper.PanicIfError(err)
 	//defer func(db *gorm.DB) {
 	//	sql, err := db.DB()

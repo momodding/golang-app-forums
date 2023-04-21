@@ -1,9 +1,15 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"forum-app/config"
+	"github.com/gofiber/fiber/v2"
+	"github.com/spf13/viper"
+)
 
 func main() {
 	app := fiber.New()
+
+	config.LoadConfig()
 
 	categoryController := InitializeCategoryController()
 
@@ -14,5 +20,5 @@ func main() {
 	app.Get("/categories", categoryController.FindAll)
 	app.Post("/categories", categoryController.Create)
 
-	app.Listen(":3000")
+	app.Listen(":" + viper.GetString("app.port"))
 }

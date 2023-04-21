@@ -1,7 +1,9 @@
 package config
 
 import (
+	"fmt"
 	"forum-app/helper"
+	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -15,7 +17,9 @@ type DBSession struct {
 }
 
 func NewDbSession() *gorm.DB {
-	dsn := "host=winhost user=momodding password=mache123 dbname=forum-app port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable TimeZone=Asia/Jakarta",
+		viper.GetString("app.db.host"), viper.GetString("app.db.user"), viper.GetString("app.db.password"), viper.GetString("app.db.name"),
+		viper.GetString("app.db.port"))
 
 	newLogger := logger.New(
 		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer

@@ -34,9 +34,6 @@ func TestInit(t *testing.T) {
 }
 
 func (s *Suite) Test_Find_All_then_Return_data() {
-	//var (
-	//	id = uint64(1)
-	//)
 	s.service.On("FindAll").Return([]entity.Category{{ID: 1, Name: "baru"}})
 
 	req := httptest.NewRequest("GET", "/categories", nil)

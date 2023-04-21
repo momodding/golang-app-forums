@@ -52,3 +52,23 @@ func (s *Suite) Test_Find_All_then_Return_data() {
 	assert.NotEqual(s.T(), 0, len(data))
 	assert.Equal(s.T(), 1, data[0].ID)
 }
+
+func (s *Suite) Test_Create_then_Return_data() {
+	s.service.On("Create").Return(entity.Category{ID: 1, Name: "baru"})
+
+	req := httptest.NewRequest("POST", "/categories", nil)
+	req.Header.Set("X-Custom-Header", "hi")
+
+	app := fiber.New()
+	// http.Response
+	resp, _ := app.Test(req)
+	var data entity.Category
+	err := json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		return
+	}
+
+	assert.NotEqual(s.T(), nil, resp)
+	assert.NotEqual(s.T(), nil, data)
+	assert.Equal(s.T(), 1, data.ID)
+}

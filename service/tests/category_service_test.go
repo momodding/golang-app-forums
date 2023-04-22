@@ -1,9 +1,10 @@
-package service
+package tests
 
 import (
 	"database/sql"
 	"fmt"
 	"forum-app/entity"
+	service2 "forum-app/service"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -23,7 +24,7 @@ type Suite struct {
 	DB   *sql.DB
 	mock sqlmock.Sqlmock
 
-	service CategoryService
+	service service2.CategoryService
 }
 
 func (s *Suite) SetupSuite() {
@@ -47,7 +48,7 @@ func (s *Suite) SetupSuite() {
 	gdb, err := gorm.Open(postgres.New(postgres.Config{Conn: s.DB}), &gorm.Config{Logger: newLogger})
 	require.NoError(s.T(), err)
 
-	s.service = NewCategoryService(gdb)
+	s.service = service2.NewCategoryService(gdb)
 }
 
 func (s *Suite) AfterTest(_, _ string) {

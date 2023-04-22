@@ -1,7 +1,8 @@
-package controller
+package tests
 
 import (
 	"encoding/json"
+	controller2 "forum-app/controller"
 	"forum-app/entity"
 	mocks "forum-app/mocks/service"
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +15,7 @@ import (
 type Suite struct {
 	suite.Suite
 
-	controller CategoryController
+	controller controller2.CategoryController
 	service    mocks.CategoryService
 }
 
@@ -22,7 +23,7 @@ func (s *Suite) SetupSuite() {
 
 	s.service = mocks.CategoryService{}
 
-	s.controller = NewCategoryController(&s.service)
+	s.controller = controller2.NewCategoryController(&s.service)
 }
 
 func (s *Suite) AfterTest(_, _ string) {

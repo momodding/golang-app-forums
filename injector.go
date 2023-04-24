@@ -7,6 +7,7 @@ import (
 	"forum-app/config"
 	"forum-app/controller"
 	"forum-app/service"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 )
 
@@ -21,6 +22,23 @@ func InitializeCategoryController() *controller.CategoryControllerImpl {
 	wire.Build(
 		config.NewDbSession,
 		categorySet,
+	)
+
+	return nil
+}
+
+var userSet = wire.NewSet(
+	service.NewUserService,
+	wire.Bind(new(service.UserService), new(*service.UserServiceImpl)),
+	controller.NewUserController,
+	wire.Bind(new(controller.UserController), new(*controller.UserControllerImpl)),
+)
+
+func InitializeUserController() *controller.UserControllerImpl {
+	wire.Build(
+		config.NewDbSession,
+		validator.New,
+		userSet,
 	)
 
 	return nil

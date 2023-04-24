@@ -10,6 +10,7 @@ import (
 	"forum-app/config"
 	"forum-app/controller"
 	"forum-app/service"
+	"github.com/go-playground/validator/v10"
 	"github.com/google/wire"
 )
 
@@ -22,6 +23,16 @@ func InitializeCategoryController() *controller.CategoryControllerImpl {
 	return categoryControllerImpl
 }
 
+func InitializeUserController() *controller.UserControllerImpl {
+	db := config.NewDbSession()
+	validate := validator.New()
+	userServiceImpl := service.NewUserService(db, validate)
+	userControllerImpl := controller.NewUserController(userServiceImpl)
+	return userControllerImpl
+}
+
 // injector.go:
 
 var categorySet = wire.NewSet(service.NewCategoryService, wire.Bind(new(service.CategoryService), new(*service.CategoryServiceImpl)), controller.NewCategoryController, wire.Bind(new(controller.CategoryController), new(*controller.CategoryControllerImpl)))
+
+var userSet = wire.NewSet(service.NewUserService, wire.Bind(new(service.UserService), new(*service.UserServiceImpl)), controller.NewUserController, wire.Bind(new(controller.UserController), new(*controller.UserControllerImpl)))

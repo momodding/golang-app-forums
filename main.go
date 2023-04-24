@@ -12,6 +12,7 @@ func main() {
 	config.LoadConfig()
 
 	categoryController := InitializeCategoryController()
+	userController := InitializeUserController()
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
@@ -19,6 +20,8 @@ func main() {
 
 	app.Get("/categories", categoryController.FindAll)
 	app.Post("/categories", categoryController.Create)
+
+	app.Post("/users/register", userController.Register)
 
 	app.Listen(":" + viper.GetString("app.port"))
 }

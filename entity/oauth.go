@@ -1,5 +1,7 @@
 package entity
 
+import "time"
+
 type OauthClient struct {
 	CommonEntity `gorm:"embedded"`
 	Key          string `gorm:"column:key;size:255" json:"key"`
@@ -44,10 +46,11 @@ func (table *OauthUser) TableName() string {
 
 type OauthRefreshToken struct {
 	CommonEntity `gorm:"embedded"`
-	ClientId     uint64 `gorm:"column:client_id" json:"client_id"`
-	UserId       uint64 `gorm:"column:user_id" json:"user_id"`
-	Token        string `gorm:"column:token;size:255" json:"token"`
-	Scope        string `gorm:"column:scope;size:100" json:"scope"`
+	ClientId     uint64    `gorm:"column:client_id" json:"client_id"`
+	UserId       uint64    `gorm:"column:user_id" json:"user_id"`
+	Token        string    `gorm:"column:token;size:255" json:"token"`
+	Scope        string    `gorm:"column:scope;size:100" json:"scope"`
+	ExpiredAt    time.Time `gorm:"column:expires_at" json:"expire_at"`
 }
 
 func (table *OauthRefreshToken) TableName() string {
@@ -56,10 +59,11 @@ func (table *OauthRefreshToken) TableName() string {
 
 type OauthAccessToken struct {
 	CommonEntity `gorm:"embedded"`
-	ClientId     uint64 `gorm:"column:client_id" json:"client_id"`
-	UserId       uint64 `gorm:"column:user_id" json:"user_id"`
-	Token        string `gorm:"column:token;size:255" json:"token"`
-	Scope        string `gorm:"column:scope;size:100" json:"scope"`
+	ClientId     uint64    `gorm:"column:client_id" json:"client_id"`
+	UserId       uint64    `gorm:"column:user_id" json:"user_id"`
+	Token        string    `gorm:"column:token;size:255" json:"token"`
+	Scope        string    `gorm:"column:scope;size:100" json:"scope"`
+	ExpiredAt    time.Time `gorm:"column:expires_at" json:"expire_at"`
 }
 
 func (table *OauthAccessToken) TableName() string {

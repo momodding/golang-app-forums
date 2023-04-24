@@ -21,7 +21,7 @@ func NewCategoryService(db *gorm.DB) *CategoryServiceImpl {
 }
 
 func (s *CategoryServiceImpl) Save(category entity.Category) entity.Category {
-	tx := s.db.Begin()
+	tx := s.db.Model(&entity.Category{}).Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()
@@ -42,7 +42,7 @@ func (s *CategoryServiceImpl) Save(category entity.Category) entity.Category {
 
 func (s *CategoryServiceImpl) FindAll() []entity.Category {
 	var categories []entity.Category
-	s.db.Find(&categories)
+	s.db.Model(&entity.Category{}).Find(&categories)
 
 	return categories
 }

@@ -2,7 +2,6 @@ package tests
 
 import (
 	"database/sql"
-	"fmt"
 	"forum-app/entity"
 	service2 "forum-app/service"
 	"github.com/DATA-DOG/go-sqlmock"
@@ -68,24 +67,24 @@ func (s *Suite) Test_Find_All_then_Return_data() {
 			AddRow(id, "test", "test"))
 
 	res := s.service.FindAll()
-	assert.Equal(s.T(), id, res[0].ID)
+	assert.Equal(s.T(), id, res[0].CommonEntity.ID)
 }
 
 func (s *Suite) Test_Save_then_Return_data() {
 	var (
 		id       = uint64(1)
 		currTime = time.Now()
-		category = &entity.Category{Name: "test", Description: "test", CreatedAt: &currTime, UpdatedAt: &currTime}
+		category = &entity.Category{Name: "test", Description: "test", CommonEntity: entity.CommonEntity{CreatedAt: &currTime, UpdatedAt: &currTime, DeletedAt: nil}}
 	)
-	fmt.Println(currTime)
+
 	s.mock.ExpectBegin()
-	s.mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "category" ("name","description","created_at","updated_at","deleted_at") 
+	s.mock.ExpectQuery(regexp.QuoteMeta(`INSERT INTO "category" ("created_at","updated_at","deleted_at","name","description") 
 						VALUES ($1,$2,$3,$4,$5) RETURNING "id"`)).
-		WithArgs(category.Name, category.Description, category.CreatedAt, category.UpdatedAt, category.DeletedAt).
+		WithArgs(currTime, currTime, nil, category.Name, category.Description).
 		WillReturnRows(sqlmock.NewRows([]string{"id"}).
 			AddRow(id))
 	s.mock.ExpectCommit()
 
 	res := s.service.Save(*category)
-	assert.Equal(s.T(), id, res.ID)
+	assert.Equal(s.T(), id, res.CommonEntity.ID)
 }

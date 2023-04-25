@@ -1,0 +1,2 @@
+ALTER TABLE oauth_user
+    ALTER COLUMN password TYPE VARCHAR(100);

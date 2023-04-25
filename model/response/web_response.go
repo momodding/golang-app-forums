@@ -17,7 +17,7 @@ func NewSuccessResponse(data interface{}, message string) *WebResponse {
 
 func NewErrorResponse(errorCode int, error interface{}, message string) *WebResponse {
 	return &WebResponse{
-		Code:    200,
+		Code:    errorCode,
 		Message: message,
 		Error:   error,
 	}

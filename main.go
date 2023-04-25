@@ -2,12 +2,17 @@ package main
 
 import (
 	"forum-app/config"
+	"forum-app/exception"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/spf13/viper"
 )
 
 func main() {
-	app := fiber.New()
+	app := fiber.New(fiber.Config{
+		ErrorHandler: exception.ErrorHandler,
+	})
+	app.Use(recover.New())
 
 	config.LoadConfig()
 

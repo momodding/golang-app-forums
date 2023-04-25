@@ -12,3 +12,12 @@ Content-Type: application/json
   "name": "testing 3",
   "description": "nyoba testing lagi 3"
 }
+
+### POST user registration
+POST localhost:3000/users/register
+Content-Type: application/json
+
+{
+  "username": "user_1",
+  "password": "root123"
+}

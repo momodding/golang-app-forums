@@ -31,8 +31,20 @@ func InitializeUserController() *controller.UserControllerImpl {
 	return userControllerImpl
 }
 
+func InitializeOauthController() *controller.OauthControllerImpl {
+	db := config.NewDbSession()
+	tokenServiceImpl := service.NewTokenService(db)
+	oauthServiceImpl := service.NewOauthService(db, tokenServiceImpl)
+	oauthControllerImpl := controller.NewOauthController(oauthServiceImpl)
+	return oauthControllerImpl
+}
+
 // injector.go:
 
 var categorySet = wire.NewSet(service.NewCategoryService, wire.Bind(new(service.CategoryService), new(*service.CategoryServiceImpl)), controller.NewCategoryController, wire.Bind(new(controller.CategoryController), new(*controller.CategoryControllerImpl)))
 
 var userSet = wire.NewSet(service.NewUserService, wire.Bind(new(service.UserService), new(*service.UserServiceImpl)), controller.NewUserController, wire.Bind(new(controller.UserController), new(*controller.UserControllerImpl)))
+
+var oauthSet = wire.NewSet(service.NewOauthService, wire.Bind(new(service.OauthService), new(*service.OauthServiceImpl)), controller.NewOauthController, wire.Bind(new(controller.OauthController), new(*controller.OauthControllerImpl)))
+
+var tokenSet = wire.NewSet(service.NewTokenService, wire.Bind(new(service.TokenService), new(*service.TokenServiceImpl)))

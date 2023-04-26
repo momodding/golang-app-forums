@@ -29,7 +29,14 @@ func (ctrl *OauthControllerImpl) Authorize(ctx *fiber.Ctx) error {
 		"password": ctrl.oauthService.PasswordGrant,
 	}
 
-	handler := grantTypes[body.GrantType]
+	handler, isHandlerExist := grantTypes[body.GrantType]
+	if !isHandlerExist {
+		return ctx.Status(fiber.StatusOK).JSON(
+			response.NewErrorResponse(fiber.StatusBadRequest, fiber.Map{
+				"grant_type": " Invalid grant type",
+			}, "Authorization Failed"),
+		)
+	}
 	result := handler(body)
 
 	return ctx.Status(fiber.StatusOK).JSON(

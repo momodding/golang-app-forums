@@ -3,7 +3,6 @@ package service
 import (
 	"errors"
 	"forum-app/entity"
-	"forum-app/helper"
 	"forum-app/model/request"
 	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
@@ -12,22 +11,18 @@ import (
 
 type UserService interface {
 	Register(request request.UserRegistration) (*entity.OauthUser, error)
+	ValidateUsername(field validator.FieldLevel) bool
 }
 
 type UserServiceImpl struct {
-	DB       *gorm.DB
-	Validate *validator.Validate
+	DB *gorm.DB
 }
 
-func NewUserService(DB *gorm.DB, Validate *validator.Validate) *UserServiceImpl {
-	return &UserServiceImpl{DB: DB, Validate: Validate}
+func NewUserService(DB *gorm.DB) *UserServiceImpl {
+	return &UserServiceImpl{DB: DB}
 }
 
 func (service *UserServiceImpl) Register(request request.UserRegistration) (*entity.OauthUser, error) {
-	service.Validate.RegisterValidation("validateUsername", service.ValidateUsername)
-	err := service.Validate.Struct(request)
-	helper.PanicIfError(err)
-
 	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), 3)
 	if err != nil {
 		return nil, err

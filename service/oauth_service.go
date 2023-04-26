@@ -6,13 +6,11 @@ import (
 	"forum-app/helper"
 	"forum-app/model/request"
 	"forum-app/model/response"
-	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type OauthService interface {
@@ -20,11 +18,12 @@ type OauthService interface {
 }
 
 type OauthServiceImpl struct {
-	DB *gorm.DB
+	DB           *gorm.DB
+	tokenService TokenService
 }
 
-func NewOauthService(DB *gorm.DB) *OauthServiceImpl {
-	return &OauthServiceImpl{DB: DB}
+func NewOauthService(DB *gorm.DB, tokenService TokenService) *OauthServiceImpl {
+	return &OauthServiceImpl{DB: DB, tokenService: tokenService}
 }
 
 func (service *OauthServiceImpl) PasswordGrant(request request.PasswordGrant) response.AccessTokenResponse {
@@ -37,10 +36,10 @@ func (service *OauthServiceImpl) PasswordGrant(request request.PasswordGrant) re
 	user, err := service.AuthUser(request.Username, request.Password)
 	helper.PanicIfError(err)
 
-	accessToken, err := service.GetAccessToken(client, user, scope)
+	accessToken, err := service.tokenService.GetAccessToken(client, user, scope)
 	helper.PanicIfError(err)
 
-	refreshToken, err := service.GetRefreshToken(client, user, scope)
+	refreshToken, err := service.tokenService.GetRefreshToken(client, user, scope)
 	helper.PanicIfError(err)
 
 	return response.AccessTokenResponse{
@@ -97,81 +96,4 @@ func (service *OauthServiceImpl) AuthUser(username string, password string) (*en
 	}
 
 	return user, nil
-}
-
-func (service *OauthServiceImpl) GetAccessToken(client *entity.OauthClient, user *entity.OauthUser, scope string) (*entity.OauthAccessToken, error) {
-	tx := service.DB.Begin()
-
-	query := tx.Where("client_id = ?", client.ID)
-	if user != nil {
-		query = query.Where("user_id = ?", user.ID)
-	} else {
-		query = query.Where("user_id IS NULL")
-	}
-	if err := query.Where("expires_at <= ?", time.Now()).Delete(new(entity.OauthAccessToken)).Error; err != nil {
-		tx.Rollback() // rollback the transaction
-		return nil, err
-	}
-
-	accessToken := &entity.OauthAccessToken{
-		ClientId:  client.ID,
-		UserId:    user.ID,
-		Token:     uuid.New().String(),
-		Scope:     scope,
-		ExpiredAt: time.Now().UTC().Add(time.Duration(86400) * time.Second),
-	}
-
-	if err := tx.Create(accessToken).Error; err != nil {
-		tx.Rollback() // rollback the transaction
-		return nil, err
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback() // rollback the transaction
-		return nil, err
-	}
-
-	return accessToken, nil
-}
-
-func (service *OauthServiceImpl) GetRefreshToken(client *entity.OauthClient, user *entity.OauthUser, scope string) (*entity.OauthRefreshToken, error) {
-	tx := service.DB.Begin()
-
-	refreshToken := &entity.OauthRefreshToken{}
-	query := tx.Where("client_id = ?", client.ID)
-	if user != nil {
-		query = query.Where("user_id = ?", user.ID)
-	} else {
-		query = query.Where("user_id IS NULL")
-	}
-	err := query.First(refreshToken).Error
-	isFound := !errors.Is(err, gorm.ErrRecordNotFound)
-	isNotExpired := false
-	if isFound {
-		isNotExpired = time.Now().UTC().After(refreshToken.ExpiredAt)
-	}
-
-	if isNotExpired {
-		return refreshToken, nil
-	}
-
-	refreshToken = &entity.OauthRefreshToken{
-		ClientId:  client.ID,
-		UserId:    user.ID,
-		Token:     uuid.New().String(),
-		Scope:     scope,
-		ExpiredAt: time.Now().UTC().Add(time.Duration(86400) * time.Second),
-	}
-
-	if err := tx.Create(refreshToken).Error; err != nil {
-		tx.Rollback() // rollback the transaction
-		return nil, err
-	}
-
-	if err := tx.Commit().Error; err != nil {
-		tx.Rollback() // rollback the transaction
-		return nil, err
-	}
-
-	return refreshToken, nil
 }

@@ -3,6 +3,7 @@ package exception
 import (
 	"forum-app/model/response"
 	"github.com/go-playground/validator/v10"
+	"github.com/gobeam/stringy"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -19,7 +20,8 @@ func validationError(ctx *fiber.Ctx, err error) (bool, error) {
 	if isError {
 		errorOut := make(map[string]string, len(exception))
 		for _, fieldErr := range exception {
-			errorOut[fieldErr.Field()] = ParseTags(fieldErr)
+			field := stringy.New(fieldErr.Field()).LcFirst()
+			errorOut[field] = ParseTags(fieldErr)
 		}
 		code := fiber.StatusBadRequest
 		resp := ctx.Status(code).JSON(response.NewErrorResponse(code, errorOut, "error validation"))

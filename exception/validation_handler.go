@@ -10,6 +10,8 @@ func ParseTags(fe validator.FieldError) string {
 		return "Invalid email"
 	case "validateUsername":
 		return "Invalid or duplicate username"
+	case "validateGrantType":
+		return "Invalid grant type"
 	}
 	return fe.Error() // default error
 }

@@ -1,7 +1,7 @@
 package response
 
 type AccessTokenResponse struct {
-	UserID       string `json:"UserID,omitempty"`
+	UserID       string `json:"UserId,omitempty"`
 	AccessToken  string `json:"accessToken"`
 	ExpiresIn    int    `json:"expiresIn"`
 	TokenType    string `json:"tokenType"`

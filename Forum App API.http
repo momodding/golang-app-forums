@@ -30,6 +30,6 @@ Content-Type: application/json
   "username": "user_1",
   "password": "root123",
   "scope": "read",
-  "grant_type": "password",
-  "client_id": "test_client_1"
+  "grantType": "passwords",
+  "clientId": "test_client_1"
 }

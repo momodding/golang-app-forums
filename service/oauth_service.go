@@ -6,6 +6,7 @@ import (
 	"forum-app/helper"
 	"forum-app/model/request"
 	"forum-app/model/response"
+	"github.com/go-playground/validator/v10"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"sort"
@@ -14,6 +15,7 @@ import (
 )
 
 type OauthService interface {
+	ValidateGrantType(field validator.FieldLevel) bool
 	PasswordGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 }
 
@@ -97,4 +99,13 @@ func (service *OauthServiceImpl) AuthUser(username string, password string) (*en
 	}
 
 	return user, nil
+}
+
+func (service *OauthServiceImpl) ValidateGrantType(field validator.FieldLevel) bool {
+	grantType := map[string]int{
+		"password": 1,
+	}
+
+	_, isGrantTypeExist := grantType[field.Field().String()]
+	return isGrantTypeExist
 }

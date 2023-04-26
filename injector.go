@@ -60,6 +60,7 @@ func InitializeOauthController() *controller.OauthControllerImpl {
 	wire.Build(
 		config.NewDbSession,
 		tokenSet,
+		validator.New,
 		oauthSet,
 	)
 	return nil

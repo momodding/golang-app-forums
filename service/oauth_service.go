@@ -14,7 +14,7 @@ import (
 )
 
 type OauthService interface {
-	PasswordGrant(request request.PasswordGrant) response.AccessTokenResponse
+	PasswordGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 }
 
 type OauthServiceImpl struct {
@@ -26,7 +26,7 @@ func NewOauthService(DB *gorm.DB, tokenService TokenService) *OauthServiceImpl {
 	return &OauthServiceImpl{DB: DB, tokenService: tokenService}
 }
 
-func (service *OauthServiceImpl) PasswordGrant(request request.PasswordGrant) response.AccessTokenResponse {
+func (service *OauthServiceImpl) PasswordGrant(request request.AuthorizationGrant) response.AccessTokenResponse {
 	client, err := service.GetClient(request.ClientId)
 	helper.PanicIfError(err)
 
@@ -72,11 +72,12 @@ func (service *OauthServiceImpl) GetScope(requestScope string) (string, error) {
 	}
 
 	scopes := strings.Split(requestScope, " ")
+	countOfScopes := int64(len(scopes))
 
 	var count int64
 	service.DB.Model(&entity.OauthScope{}).Where("scope in (?)", scopes).Count(&count)
 
-	if count != int64(len(scopes)) {
+	if count == countOfScopes {
 		return requestScope, nil
 	}
 

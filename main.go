@@ -18,6 +18,7 @@ func main() {
 
 	categoryController := InitializeCategoryController()
 	userController := InitializeUserController()
+	oauthController := InitializeOauthController()
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
@@ -27,6 +28,9 @@ func main() {
 	app.Post("/categories", categoryController.Create)
 
 	app.Post("/users/register", userController.Register)
+
+	oauthRoute := app.Group("/oauth")
+	oauthRoute.Post("authorize", oauthController.Authorize)
 
 	app.Listen(":" + viper.GetString("app.port"))
 }

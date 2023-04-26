@@ -1,10 +1,10 @@
 package response
 
 type AccessTokenResponse struct {
-	UserID       string `json:"user_id,omitempty"`
-	AccessToken  string `json:"access_token"`
-	ExpiresIn    int    `json:"expires_in"`
-	TokenType    string `json:"token_type"`
+	UserID       string `json:"UserID,omitempty"`
+	AccessToken  string `json:"accessToken"`
+	ExpiresIn    int    `json:"expiresIn"`
+	TokenType    string `json:"tokenType"`
 	Scope        string `json:"scope"`
-	RefreshToken string `json:"refresh_token,omitempty"`
+	RefreshToken string `json:"refreshToken,omitempty"`
 }

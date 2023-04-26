@@ -43,3 +43,24 @@ func InitializeUserController() *controller.UserControllerImpl {
 
 	return nil
 }
+
+var oauthSet = wire.NewSet(
+	service.NewOauthService,
+	wire.Bind(new(service.OauthService), new(*service.OauthServiceImpl)),
+	controller.NewOauthController,
+	wire.Bind(new(controller.OauthController), new(*controller.OauthControllerImpl)),
+)
+
+var tokenSet = wire.NewSet(
+	service.NewTokenService,
+	wire.Bind(new(service.TokenService), new(*service.TokenServiceImpl)),
+)
+
+func InitializeOauthController() *controller.OauthControllerImpl {
+	wire.Build(
+		config.NewDbSession,
+		tokenSet,
+		oauthSet,
+	)
+	return nil
+}

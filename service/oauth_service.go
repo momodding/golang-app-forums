@@ -18,6 +18,7 @@ type OauthService interface {
 	ValidateGrantType(field validator.FieldLevel) bool
 	AuthorizeCodeGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 	PasswordGrant(request request.AuthorizationGrant) response.AccessTokenResponse
+	GetClient(clientId string) (*entity.OauthClient, error)
 }
 
 type OauthServiceImpl struct {

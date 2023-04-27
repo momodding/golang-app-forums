@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"forum-app/entity"
 	"forum-app/helper"
 	"forum-app/model/request"
 	"forum-app/model/response"
@@ -11,6 +12,7 @@ import (
 
 type OauthController interface {
 	Authorize(ctx *fiber.Ctx) error
+	GetClient(client string) (*entity.OauthClient, error)
 }
 
 type OauthControllerImpl struct {
@@ -40,7 +42,7 @@ func (ctrl *OauthControllerImpl) Authorize(ctx *fiber.Ctx) error {
 	if !isHandlerExist {
 		return ctx.Status(fiber.StatusOK).JSON(
 			response.NewErrorResponse(fiber.StatusBadRequest, fiber.Map{
-				"grant_type": " invalid grant type",
+				"grant_type": "invalid grant type",
 			}, "Authorization Failed"),
 		)
 	}
@@ -49,4 +51,8 @@ func (ctrl *OauthControllerImpl) Authorize(ctx *fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(
 		response.NewSuccessResponse(result, "Authorization Success"),
 	)
+}
+
+func (ctrl *OauthControllerImpl) GetClient(client string) (*entity.OauthClient, error) {
+	return ctrl.oauthService.GetClient(client)
 }

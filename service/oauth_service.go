@@ -16,6 +16,7 @@ import (
 
 type OauthService interface {
 	ValidateGrantType(field validator.FieldLevel) bool
+	AuthorizeCodeGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 	PasswordGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 }
 
@@ -26,6 +27,10 @@ type OauthServiceImpl struct {
 
 func NewOauthService(DB *gorm.DB, tokenService TokenService) *OauthServiceImpl {
 	return &OauthServiceImpl{DB: DB, tokenService: tokenService}
+}
+
+func (service *OauthServiceImpl) AuthorizeCodeGrant(request request.AuthorizationGrant) response.AccessTokenResponse {
+	return response.AccessTokenResponse{}
 }
 
 func (service *OauthServiceImpl) PasswordGrant(request request.AuthorizationGrant) response.AccessTokenResponse {

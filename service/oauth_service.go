@@ -18,6 +18,7 @@ type OauthService interface {
 	ValidateGrantType(field validator.FieldLevel) bool
 	AuthorizeCodeGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 	PasswordGrant(request request.AuthorizationGrant) response.AccessTokenResponse
+	RefreshTokenGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 	GetClient(clientId string) (*entity.OauthClient, error)
 	GetScope(requestScope string) (string, error)
 	AuthUser(username string, password string) (*entity.OauthUser, error)
@@ -51,6 +52,35 @@ func (service *OauthServiceImpl) PasswordGrant(request request.AuthorizationGran
 	helper.PanicIfError(err)
 
 	refreshToken, err := service.tokenService.GetRefreshToken(client, user, scope)
+	helper.PanicIfError(err)
+
+	return response.AccessTokenResponse{
+		UserID:       strconv.FormatUint(user.ID, 10),
+		AccessToken:  accessToken.Token,
+		ExpiresIn:    86400,
+		TokenType:    "Bearer",
+		Scope:        scope,
+		RefreshToken: refreshToken.Token,
+	}
+}
+
+func (service *OauthServiceImpl) RefreshTokenGrant(request request.AuthorizationGrant) response.AccessTokenResponse {
+	client, err := service.GetClient(request.ClientId)
+	helper.PanicIfError(err)
+
+	refreshToken, err := service.tokenService.GetRefreshTokenByToken(request.RefreshToken, client)
+	helper.PanicIfError(err)
+
+	scope, err := service.GetScope(request.Scope)
+	helper.PanicIfError(err)
+
+	user := &entity.OauthUser{}
+	err = service.DB.Where("id = ?", refreshToken.UserId).First(user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		helper.PanicIfError(errors.New("user not found"))
+	}
+
+	accessToken, err := service.tokenService.GetAccessToken(client, user, scope)
 	helper.PanicIfError(err)
 
 	return response.AccessTokenResponse{

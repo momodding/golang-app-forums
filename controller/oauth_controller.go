@@ -35,7 +35,8 @@ func (ctrl *OauthControllerImpl) Authorize(ctx *fiber.Ctx) error {
 	helper.PanicIfError(err)
 
 	grantTypes := map[string]func(body request.AuthorizationGrant) response.AccessTokenResponse{
-		"password": ctrl.oauthService.PasswordGrant,
+		"password":      ctrl.oauthService.PasswordGrant,
+		"refresh_token": ctrl.oauthService.RefreshTokenGrant,
 	}
 
 	handler, isHandlerExist := grantTypes[body.GrantType]

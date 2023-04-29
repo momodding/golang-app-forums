@@ -11,6 +11,7 @@ import (
 type TokenService interface {
 	GetAccessToken(client *entity.OauthClient, user *entity.OauthUser, scope string) (*entity.OauthAccessToken, error)
 	GetRefreshToken(client *entity.OauthClient, user *entity.OauthUser, scope string) (*entity.OauthRefreshToken, error)
+	GetRefreshTokenByToken(token string, client *entity.OauthClient) (*entity.OauthRefreshToken, error)
 }
 
 type TokenServiceImpl struct {
@@ -54,6 +55,22 @@ func (service *TokenServiceImpl) GetAccessToken(client *entity.OauthClient, user
 	}
 
 	return accessToken, nil
+}
+
+func (service *TokenServiceImpl) GetRefreshTokenByToken(token string, client *entity.OauthClient) (*entity.OauthRefreshToken, error) {
+	refreshToken := &entity.OauthRefreshToken{}
+	err := service.DB.Where("client_id = ?", client.ID).
+		Where("token = ?", token).First(refreshToken).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errors.New("refresh token not found")
+	}
+
+	if time.Now().UTC().After(refreshToken.ExpiredAt) {
+		return nil, errors.New("refresh token expired")
+	}
+
+	return refreshToken, nil
 }
 
 func (service *TokenServiceImpl) GetRefreshToken(client *entity.OauthClient, user *entity.OauthUser, scope string) (*entity.OauthRefreshToken, error) {

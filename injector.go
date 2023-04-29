@@ -65,3 +65,18 @@ func InitializeOauthController() *controller.OauthControllerImpl {
 	)
 	return nil
 }
+
+var authSet = wire.NewSet(
+	controller.NewAuthController,
+	wire.Bind(new(controller.AuthController), new(*controller.AuthControllerImpl)),
+)
+
+func InitializeAuthController() *controller.AuthControllerImpl {
+	wire.Build(
+		config.NewDbSession,
+		tokenSet,
+		authSet,
+		oauthSet,
+	)
+	return nil
+}

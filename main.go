@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html"
 	"github.com/spf13/viper"
+	"log"
 )
 
 func main() {
@@ -24,13 +25,6 @@ func main() {
 	oauthController := InitializeOauthController()
 	authController := InitializeAuthController()
 
-	app.Use(func(c *fiber.Ctx) error {
-		clientId := c.Get("clientId")
-		client, _ := oauthController.GetClient(clientId)
-		c.Locals("client", client)
-		return c.Next()
-	})
-
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Hello, World!")
 	})
@@ -43,7 +37,18 @@ func main() {
 	oauthRoute := app.Group("/oauth")
 	oauthRoute.Post("authorize", oauthController.Authorize)
 
-	authRoute := app.Group("/auth")
+	authRoute := app.Group("/auth", func(c *fiber.Ctx) error {
+		clientId := c.Query("clientId")
+
+		c.Locals("client", nil)
+		if clientId != "" {
+			log.Println("clientId = " + clientId)
+			client, _ := oauthController.GetClient(clientId)
+			c.Locals("client", client)
+		}
+
+		return c.Next()
+	})
 	authRoute.Get("login", authController.LoginView)
 
 	app.Listen(":" + viper.GetString("app.port"))

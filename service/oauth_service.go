@@ -19,6 +19,9 @@ type OauthService interface {
 	AuthorizeCodeGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 	PasswordGrant(request request.AuthorizationGrant) response.AccessTokenResponse
 	GetClient(clientId string) (*entity.OauthClient, error)
+	GetScope(requestScope string) (string, error)
+	AuthUser(username string, password string) (*entity.OauthUser, error)
+	GetToken(client *entity.OauthClient, user *entity.OauthUser, scope string) (*entity.OauthAccessToken, *entity.OauthRefreshToken, error)
 }
 
 type OauthServiceImpl struct {
@@ -105,6 +108,16 @@ func (service *OauthServiceImpl) AuthUser(username string, password string) (*en
 	}
 
 	return user, nil
+}
+
+func (service *OauthServiceImpl) GetToken(client *entity.OauthClient, user *entity.OauthUser, scope string) (*entity.OauthAccessToken, *entity.OauthRefreshToken, error) {
+	accessToken, err := service.tokenService.GetAccessToken(client, user, scope)
+	helper.PanicIfError(err)
+
+	refreshToken, err := service.tokenService.GetRefreshToken(client, user, scope)
+	helper.PanicIfError(err)
+
+	return accessToken, refreshToken, nil
 }
 
 func (service *OauthServiceImpl) ValidateGrantType(field validator.FieldLevel) bool {

@@ -80,3 +80,13 @@ func InitializeAuthController() *controller.AuthControllerImpl {
 	)
 	return nil
 }
+
+func InitializeMiddleware() *config.Middleware {
+	wire.Build(
+		config.NewDbSession,
+		tokenSet,
+		oauthSet,
+		config.NewMiddleware,
+	)
+	return nil
+}

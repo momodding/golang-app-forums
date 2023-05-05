@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html"
 	"github.com/spf13/viper"
+	"log"
 )
 
 func main() {
@@ -40,5 +41,8 @@ func main() {
 	authRoute := app.Group("/auth", middleware.OauthClientMiddleware)
 	authRoute.Get("login", authController.LoginView)
 
-	app.Listen(":" + viper.GetString("app.port"))
+	err := app.Listen(":" + viper.GetString("app.port"))
+	if err != nil {
+		log.Fatal("Error running app: " + err.Error())
+	}
 }

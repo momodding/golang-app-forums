@@ -22,7 +22,7 @@ Content-Type: application/json
   "password": "root123"
 }
 
-### POST user authorization
+### POST user authorization password grant type
 POST localhost:3000/oauth/authorize
 Content-Type: application/json
 
@@ -30,6 +30,17 @@ Content-Type: application/json
   "username": "user_1",
   "password": "root123",
   "scope": "read",
-  "grantType": "passwords",
+  "grantType": "password",
+  "clientId": "test_client_1"
+}
+
+### POST user authorization refresh_token grant type
+POST localhost:3000/oauth/authorize
+Content-Type: application/json
+
+{
+  "scope": "read",
+  "grantType": "refresh_token",
+  "refreshToken": "479440cf-37b0-4e84-bdf6-dc42f059057c",
   "clientId": "test_client_1"
 }

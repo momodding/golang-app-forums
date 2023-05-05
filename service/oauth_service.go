@@ -152,7 +152,8 @@ func (service *OauthServiceImpl) GetToken(client *entity.OauthClient, user *enti
 
 func (service *OauthServiceImpl) ValidateGrantType(field validator.FieldLevel) bool {
 	grantType := map[string]int{
-		"password": 1,
+		"password":      1,
+		"refresh_token": 1,
 	}
 
 	_, isGrantTypeExist := grantType[field.Field().String()]

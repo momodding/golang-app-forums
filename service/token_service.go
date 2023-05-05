@@ -85,12 +85,12 @@ func (service *TokenServiceImpl) GetRefreshToken(client *entity.OauthClient, use
 	}
 	err := query.First(refreshToken).Error
 	isFound := !errors.Is(err, gorm.ErrRecordNotFound)
-	isNotExpired := false
+	isExpired := false
 	if isFound {
-		isNotExpired = time.Now().UTC().After(refreshToken.ExpiredAt)
+		isExpired = time.Now().UTC().After(refreshToken.ExpiredAt)
 	}
 
-	if isNotExpired {
+	if !isExpired {
 		return refreshToken, nil
 	}
 

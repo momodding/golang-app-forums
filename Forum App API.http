@@ -3,6 +3,7 @@ GET localhost:3000
 
 ### GET categories
 GET localhost:3000/categories
+Authorization: "Bearer 5e411164-0e93-4c58-940f-a266af0f0fed"
 
 ### POST categories
 POST localhost:3000/categories

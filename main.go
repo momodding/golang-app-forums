@@ -30,8 +30,8 @@ func main() {
 		return c.SendString("Hello, World!")
 	})
 
-	app.Get("/categories", categoryController.FindAll)
-	app.Post("/categories", categoryController.Create)
+	app.Get("/categories", middleware.TokenValidatorMiddleware, categoryController.FindAll)
+	app.Post("/categories", middleware.TokenValidatorMiddleware, categoryController.Create)
 
 	app.Post("/users/register", userController.Register)
 

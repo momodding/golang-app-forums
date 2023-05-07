@@ -23,6 +23,7 @@ type OauthService interface {
 	GetScope(requestScope string) (string, error)
 	AuthUser(username string, password string) (*entity.OauthUser, error)
 	GetToken(client *entity.OauthClient, user *entity.OauthUser, scope string) (*entity.OauthAccessToken, *entity.OauthRefreshToken, error)
+	Authenticate(accessToken string) error
 }
 
 type OauthServiceImpl struct {
@@ -158,4 +159,13 @@ func (service *OauthServiceImpl) ValidateGrantType(field validator.FieldLevel) b
 
 	_, isGrantTypeExist := grantType[field.Field().String()]
 	return isGrantTypeExist
+}
+
+func (service *OauthServiceImpl) Authenticate(accessToken string) error {
+	_, err := service.tokenService.GetAccessTokenByToken(accessToken)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

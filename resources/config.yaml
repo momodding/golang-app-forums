@@ -5,5 +5,5 @@ app:
     host: localhost
     port: 5432
     user: momodding
-    password: mache123
-    name: forum-app
+    password: root123
+    name: forum_app

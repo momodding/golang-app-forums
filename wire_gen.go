@@ -25,9 +25,9 @@ func InitializeCategoryController() *controller.CategoryControllerImpl {
 
 func InitializeUserController() *controller.UserControllerImpl {
 	db := config.NewDbSession()
+	userServiceImpl := service.NewUserService(db)
 	validate := validator.New()
-	userServiceImpl := service.NewUserService(db, validate)
-	userControllerImpl := controller.NewUserController(userServiceImpl)
+	userControllerImpl := controller.NewUserController(userServiceImpl, validate)
 	return userControllerImpl
 }
 
@@ -35,8 +35,25 @@ func InitializeOauthController() *controller.OauthControllerImpl {
 	db := config.NewDbSession()
 	tokenServiceImpl := service.NewTokenService(db)
 	oauthServiceImpl := service.NewOauthService(db, tokenServiceImpl)
-	oauthControllerImpl := controller.NewOauthController(oauthServiceImpl)
+	validate := validator.New()
+	oauthControllerImpl := controller.NewOauthController(oauthServiceImpl, validate)
 	return oauthControllerImpl
+}
+
+func InitializeAuthController() *controller.AuthControllerImpl {
+	db := config.NewDbSession()
+	tokenServiceImpl := service.NewTokenService(db)
+	oauthServiceImpl := service.NewOauthService(db, tokenServiceImpl)
+	authControllerImpl := controller.NewAuthController(oauthServiceImpl)
+	return authControllerImpl
+}
+
+func InitializeMiddleware() *config.Middleware {
+	db := config.NewDbSession()
+	tokenServiceImpl := service.NewTokenService(db)
+	oauthServiceImpl := service.NewOauthService(db, tokenServiceImpl)
+	middleware := config.NewMiddleware(oauthServiceImpl)
+	return middleware
 }
 
 // injector.go:
@@ -48,3 +65,5 @@ var userSet = wire.NewSet(service.NewUserService, wire.Bind(new(service.UserServ
 var oauthSet = wire.NewSet(service.NewOauthService, wire.Bind(new(service.OauthService), new(*service.OauthServiceImpl)), controller.NewOauthController, wire.Bind(new(controller.OauthController), new(*controller.OauthControllerImpl)))
 
 var tokenSet = wire.NewSet(service.NewTokenService, wire.Bind(new(service.TokenService), new(*service.TokenServiceImpl)))
+
+var authSet = wire.NewSet(controller.NewAuthController, wire.Bind(new(controller.AuthController), new(*controller.AuthControllerImpl)))

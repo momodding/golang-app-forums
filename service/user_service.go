@@ -53,8 +53,8 @@ func (service *UserServiceImpl) FindUserByUsername(username string) (*entity.Oau
 func (service *UserServiceImpl) ValidateUsername(field validator.FieldLevel) bool {
 	_, err := service.FindUserByUsername(field.Field().String())
 	if err != nil {
-		return true
+		return false
 	}
 
-	return false
+	return true
 }
